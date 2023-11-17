@@ -20,16 +20,16 @@ class CoolStuffController extends AbstractController
     }
 
     /**
-     * @Route("/blog/{page}", name="app_page", requirements={"page"=>"\d+"})
+     * @Route("/blog/{page}", name="app_page", requirements={"page"="\d+"})
      */
     public function blog($page): JsonResponse
     {
         return $this->json("Page Numéros" . $page);
     }
     /**
-     * @Route("/blog/{slug}", name="app_slug", requirements={"slug"=>"\d+"})
+     * @Route("/blog/{slug}", name="app_slug", requirements={"slug"="\d+"})
      */
-    public function blog($slug): JsonResponse
+    public function post($slug): JsonResponse
     {
         return $this->json("Page slug " . $slug);
     }

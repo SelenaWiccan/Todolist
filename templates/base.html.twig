@@ -12,6 +12,11 @@
         {% block javascripts %}
             {{ encore_entry_script_tags('app') }}
         {% endblock %}
+<ul>
+        {% for post in posts %}
+           <li> {{ post.title }} </li>
+            {% endfor %}
+</ul>
     </head>
     <body>
         {% block body %}{% endblock %}
