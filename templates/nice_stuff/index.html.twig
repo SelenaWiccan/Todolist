@@ -17,4 +17,9 @@
         <li>Your template at <code><a href="{{ 'C:/xampp/htdocs/www/symphony/MyApp/templates/nice_stuff/index.html.twig'|file_link(0) }}">templates/nice_stuff/index.html.twig</a></code></li>
     </ul>
 </div>
+    {% for message in app.flashes('success') %}
+        <div class="alert alert-success">
+            {{ message }}
+        </div>
+    {% endfor %}
 {% endblock %}

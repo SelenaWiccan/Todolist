@@ -16,5 +16,10 @@
         <li>Your controller at <code><a href="{{ 'C:/xampp/htdocs/www/symphony/MyApp/src/Controller/PostController.php'|file_link(0) }}">src/Controller/PostController.php</a></code></li>
         <li>Your template at <code><a href="{{ 'C:/xampp/htdocs/www/symphony/MyApp/templates/post/index.html.twig'|file_link(0) }}">templates/post/index.html.twig</a></code></li>
     </ul>
+    <ul>
+        {% for post in posts %}
+            <li> {{ post.title }} </li>
+        {% endfor %}
+    </ul>
 </div>
 {% endblock %}
