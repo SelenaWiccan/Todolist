@@ -5,26 +5,251 @@
 {% block body %}
     <h1>Todo index</h1>
 
+    <input type="search" id="site-search" name="q" />
+    <button>Search</button>
+
+    <fieldset>
+        <legend>Select what you want to show:</legend>
+
+        <div>
+            <input type="radio" id="huey" name="drone" value="huey" checked />
+            <label for="huey">Show tasks to do</label>
+        </div>
+
+        <div>
+            <input type="radio" id="dewey" name="drone" value="dewey" />
+            <label for="dewey">show Done tasks </label>
+        </div>
+
+        <div>
+            <input type="radio" id="all" name="drone" value="all" />
+            <label for="dewey">show All </label>
+        </div>
+
+    </fieldset>
+
     <table class="table">
         <thead>
+
             <tr>
                 <th>Id</th>
-                <th>Name</th>
+                <th> <a href="{{ path('app_todo_index') }}?orderby=name&order={{ order }}">
+                        name
+                    </a></th>
                 <th>Description</th>
+                <th>fait</th>
                 <th>actions</th>
             </tr>
         </thead>
-        <tbody>
+        <tbody id="taskContainer">
         {% for todo in todos %}
             <tr>
                 <td>{{ todo.id }}</td>
                 <td>{{ todo.name }}</td>
                 <td>{{ todo.description }}</td>
-                <td>
-                    <a href="{{ path('app_todo_show', {'id': todo.id}) }}">show</a>
-                    <a href="{{ path('app_todo_edit', {'id': todo.id}) }}">edit</a>
-                </td>
-            </tr>
+            <td>
+                <div>
+                    <form action="{{ path('app_todo_done', {'id': todo.id}) }}" method="post">
+                        <input type="hidden" name="_method" value="POST">
+
+                        <input type="radio" class="status_radio" id="done_radio_{{ todo.id }}" name="status" value="done" data-id="{{ todo.id }}" {{ todo.done ? 'checked' : '' }} onchange="updateStatus(this)">
+                        <label for="done_radio_{{ todo.id }}">Done</label>
+
+
+                        <input type="radio" class="status_radio" id="todo_radio_{{ todo.id }}" name="status" value="todo" data-id="{{ todo.id }}" {{ not todo.done ? 'checked' : '' }} onchange="updateStatus(this)">
+
+                        <label for="todo_radio_{{ todo.id }}">To Do</label>
+
+                        <button type="submit" style="display: none;"></button>
+                    </form>
+
+                </div>
+            </td>
+
+            <td>
+                <a href="{{ path('app_todo_show', {'id': todo.id}) }}">show</a>
+                <a href="{{ path('app_todo_edit', {'id': todo.id}) }}">edit</a>
+            </td>
+
+            <script>
+                function updateStatus(radio) {
+                    var todoId = radio.dataset.id;
+                    var status = radio.value;
+
+                    // Envoyer les données au serveur
+                    fetch("http://127.0.0.1:8000/todo/" + todoId + "/updatestatus", {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            id: todoId,
+                            status: status
+                        })
+                    })
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error('Network response was not ok');
+                            }
+                            return response.json();
+                        })
+                        .then(data => {
+                            console.log('Success:', data);
+                            // Si le statut est "todo", appeler la route updatestatus2
+                            if (status === 'todo') {
+                                fetch("http://127.0.0.1:8000/todo/" + todoId + "/updatestatus2", {
+                                    method: 'POST',
+                                    headers: {
+                                        'Content-Type': 'application/json'
+                                    },
+                                    body: JSON.stringify({
+                                        id: todoId,
+                                        status: status
+                                    })
+                                })
+                                    .then(response => {
+                                        if (!response.ok) {
+                                            throw new Error('Network response was not ok');
+                                        }
+                                        return response.json();
+                                    })
+                                    .then(data => {
+                                        console.log('Success2:', data);
+                                    })
+                                    .catch(error => {
+                                        console.error('Error2:', error);
+                                    });
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                        });
+                }
+
+                document.addEventListener("DOMContentLoaded", function() {
+                    var taskContainer = document.getElementById("taskContainer");
+                    var radios = document.querySelectorAll('input[name="drone"]');
+
+                    radios.forEach(function(radio) {
+                        radio.addEventListener("change", function() {
+                            if (this.value === "huey") {
+                                taskContainer.innerHTML = "";
+
+                                {% for todo in todos %}
+                                {% if not todo.done %}
+                                taskContainer.innerHTML += `<tr>
+                <td>{{ todo.id }}</td>
+                <td>{{ todo.name }}</td>
+                <td>{{ todo.description }}</td>
+            <td>
+                <div>
+                    <form action="{{ path('app_todo_done', {'id': todo.id}) }}" method="post">
+                        <input type="hidden" name="_method" value="POST">
+
+                        <input type="radio" class="status_radio" id="done_radio_{{ todo.id }}" name="status" value="done" data-id="{{ todo.id }}" {{ todo.done ? 'checked' : '' }} onchange="updateStatus(this)">
+                        <label for="done_radio_{{ todo.id }}">Done</label>
+
+
+                        <input type="radio" class="status_radio" id="todo_radio_{{ todo.id }}" name="status" value="todo" data-id="{{ todo.id }}" {{ not todo.done ? 'checked' : '' }} onchange="updateStatus(this)">
+
+                        <label for="todo_radio_{{ todo.id }}">To Do</label>
+
+                        <button type="submit" style="display: none;"></button>
+                    </form>
+
+                </div>
+            </td>
+
+            <td>
+                <a href="{{ path('app_todo_show', {'id': todo.id}) }}">show</a>
+                <a href="{{ path('app_todo_edit', {'id': todo.id}) }}">edit</a>
+            </td>`;
+
+                                {% endif %}
+                                {% endfor %}
+                            }
+
+                            else if (this.value === "dewey") {
+                                taskContainer.innerHTML = "";
+
+                                {% for todo in todos %}
+                                {% if todo.done %}
+                                taskContainer.innerHTML += `<tr>
+                <td>{{ todo.id }}</td>
+                <td>{{ todo.name }}</td>
+                <td>{{ todo.description }}</td>
+            <td>
+                <div>
+                    <form action="{{ path('app_todo_done', {'id': todo.id}) }}" method="post">
+                        <input type="hidden" name="_method" value="POST">
+
+                        <input type="radio" class="status_radio" id="done_radio_{{ todo.id }}" name="status" value="done" data-id="{{ todo.id }}" {{ todo.done ? 'checked' : '' }} onchange="updateStatus(this)">
+                        <label for="done_radio_{{ todo.id }}">Done</label>
+
+
+                        <input type="radio" class="status_radio" id="todo_radio_{{ todo.id }}" name="status" value="todo" data-id="{{ todo.id }}" {{ not todo.done ? 'checked' : '' }} onchange="updateStatus(this)">
+
+                        <label for="todo_radio_{{ todo.id }}">To Do</label>
+
+                        <button type="submit" style="display: none;"></button>
+                    </form>
+
+                </div>
+            </td>
+
+            <td>
+                <a href="{{ path('app_todo_show', {'id': todo.id}) }}">show</a>
+                <a href="{{ path('app_todo_edit', {'id': todo.id}) }}">edit</a>
+            </td>`;
+
+                                {% endif %}
+                                {% endfor %}
+                            }
+
+                            else if (this.value === "all") {
+                                taskContainer.innerHTML = "";
+
+                                {% for todo in todos %}
+                                taskContainer.innerHTML += `<tr>
+                <td>{{ todo.id }}</td>
+                <td>{{ todo.name }}</td>
+                <td>{{ todo.description }}</td>
+            <td>
+                <div>
+                    <form action="{{ path('app_todo_done', {'id': todo.id}) }}" method="post">
+                        <input type="hidden" name="_method" value="POST">
+
+                        <input type="radio" class="status_radio" id="done_radio_{{ todo.id }}" name="status" value="done" data-id="{{ todo.id }}" {{ todo.done ? 'checked' : '' }} onchange="updateStatus(this)">
+                        <label for="done_radio_{{ todo.id }}">Done</label>
+
+
+                        <input type="radio" class="status_radio" id="todo_radio_{{ todo.id }}" name="status" value="todo" data-id="{{ todo.id }}" {{ not todo.done ? 'checked' : '' }} onchange="updateStatus(this)">
+
+                        <label for="todo_radio_{{ todo.id }}">To Do</label>
+
+                        <button type="submit" style="display: none;"></button>
+                    </form>
+
+                </div>
+            </td>
+
+            <td>
+                <a href="{{ path('app_todo_show', {'id': todo.id}) }}">show</a>
+                <a href="{{ path('app_todo_edit', {'id': todo.id}) }}">edit</a>
+            </td>`;
+
+                                {% endfor %}
+                            }
+                        });
+                    });
+                });
+
+
+            </script>
+
+
+
+
         {% else %}
             <tr>
                 <td colspan="3">no records found</td>
@@ -34,4 +259,9 @@
     </table>
 
     <a href="{{ path('app_todo_new') }}">Create new</a>
+
+
+
 {% endblock %}
+
+

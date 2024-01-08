@@ -5,6 +5,7 @@ namespace App\Repository;
 use App\Entity\Todo;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use PhpParser\Node\Expr\Array_;
 
 /**
  * @extends ServiceEntityRepository<Todo>
@@ -37,6 +38,15 @@ class TodoRepository extends ServiceEntityRepository
         if ($flush) {
             $this->getEntityManager()->flush();
         }
+    }
+
+    public function findAllOrdered($orderBy, $order):Array
+    {
+      $qb = $this ->createQueryBuilder('t')
+      ->OrderBy('t.'.$orderBy,$order)
+      ->getQuery()
+      ->getResult();
+      return $qb;
     }
 
 //    /**
