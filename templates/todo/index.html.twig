@@ -5,7 +5,7 @@
 {% block body %}
     <h1>Todo index</h1>
 
-    <input type="search" id="site-search" name="q" />
+    <input type="text" id="searchInput" onkeyup="searchFunction()" placeholder="Search for names..">cd
     <button>Search</button>
 
     <fieldset>
@@ -72,6 +72,26 @@
             </td>
 
             <script>
+                function searchFunction() {
+                    var input, filter, table, tr, td, i, txtValue;
+                    input = document.getElementById("searchInput");
+                    filter = input.value.toUpperCase();
+                    table = document.getElementById("taskContainer");
+                    tr = table.getElementsByTagName("tr");
+
+                    for (i = 0; i < tr.length; i++) {
+                        td = tr[i].getElementsByTagName("td")[1]; // Change the index to match the column you want to search
+                        if (td) {
+                            txtValue = td.textContent || td.innerText;
+                            if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                                tr[i].style.display = "";
+                            } else {
+                                tr[i].style.display = "none";
+                            }
+                        }
+                    }
+                }
+
                 function updateStatus(radio) {
                     var todoId = radio.dataset.id;
                     var status = radio.value;

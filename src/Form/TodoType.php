@@ -15,14 +15,14 @@ class TodoType extends AbstractType
         $builder
             ->add('name')
             ->add('description')
-            ->add('done', null, [
-                'label' => 'Fait'
-            ])
-            ->add('stillTodo', CheckboxType::class,[
-                'label' => 'Afficher uniquement les tâches qui restent à faire',
-                'mapped' => false,
-                'required' => false,
-            ])
+//            ->add('done', null, [
+//                'label' => 'Fait'
+           // ])
+//            ->add('stillTodo', CheckboxType::class,[
+//                'label' => 'Afficher uniquement les tâches qui restent à faire',
+//                'mapped' => false,
+//                'required' => false,
+//            ])
             //->add('done')
 //            ->add('done', CheckboxType::class, [
 //                'label' => 'Done',
